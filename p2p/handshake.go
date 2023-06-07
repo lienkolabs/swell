@@ -133,7 +133,7 @@ func PerformServerHandShake(conn net.Conn, prvKey crypto.PrivateKey, validator V
 	// check if public key is a member: TODO check if is a validator
 	var remoteToken crypto.Token
 	copy(remoteToken[:], resp[:crypto.TokenSize])
-	ok := validator(crypto.HashToken(remoteToken))
+	ok := validator.ValidateConnection(remoteToken)
 	if !<-ok {
 		conn.Close()
 		return nil, errors.New("server: not a valid public key in the network")

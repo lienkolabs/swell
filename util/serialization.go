@@ -10,6 +10,10 @@ func PutToken(token crypto.Token, data *[]byte) {
 	*data = append(*data, token[:]...)
 }
 
+func PutHash(hash crypto.Hash, data *[]byte) {
+	*data = append(*data, hash[:]...)
+}
+
 func PutSignature(sign crypto.Signature, data *[]byte) {
 	*data = append(*data, sign[:]...)
 }
@@ -75,6 +79,15 @@ func ParseToken(data []byte, position int) (crypto.Token, int) {
 	}
 	copy(token[:], data[position:position+crypto.TokenSize])
 	return token, position + crypto.TokenSize
+}
+
+func ParseHash(data []byte, position int) (crypto.Hash, int) {
+	var hash crypto.Hash
+	if position+crypto.HashSize > len(data) {
+		return hash, position
+	}
+	copy(hash[:], data[position:position+crypto.HashSize])
+	return hash, position + crypto.HashSize
 }
 
 func PutTokenCipher(tc crypto.TokenCipher, data *[]byte) {

@@ -11,7 +11,7 @@ import (
 const maxEpochReceiveMessage = 100
 const Version = 0
 
-// Events are received from trusted gateways. 
+// Events are received from trusted gateways.
 
 type Gateways struct {
 	authorized []crypto.Token
@@ -32,18 +32,18 @@ func (g *Gateways) ValidateConnection(token crypto.Token) chan bool {
 }
 
 type HashedEventBytes struct {
-	msg     []byte
-	hash    crypto.Hash
-	clock   int
+	msg   []byte
+	hash  crypto.Hash
+	clock int
 }
 
 func getEventClock(event []byte) int {
 	if event[0] != Version || len(event) < 9 {
 		return -1
 	}
-	clock, _ := util.ParseUint64(event,1)
+	clock, _ := util.ParseUint64(event, 1)
 	if clock == 0 {
-		return - 1
+		return -1
 	}
 	return int(clock)
 }
@@ -52,12 +52,11 @@ type EventBroker chan *HashedEventBytes
 
 func (e EventBroker) Queue(event []byte) {
 	e <- &HashedEventBytes{
-		msg: event,
-		hash: crypto.Hasher(msg),
+		msg:   event,
+		hash:  crypto.Hasher(msg),
 		clock: getEventClock(msg),
 	}
 }
-
 
 func NewEventBroker(
 	token crypto.PrivateKey,
@@ -80,17 +79,16 @@ func NewEventBroker(
 					if _, exists := recentHashes[deltaEpoch][hashInst.hash]; !exists {
 						recentHashes[deltaEpoch][hashInst.hash] = struct{}{}
 						comm.Events <- &HashTransaction{
-								Transaction: transaction,
-								Hash:        hashInst.hash,
-							}
-							if hashInst.nonpeer {
-								message := NewNetworkMessage(BroadcastInstruction(hashInst.msg), token, false)
-								peers.Broadcast(message)
-							}
+							Transaction: transaction,
+							Hash:        hashInst.hash,
 						}
-						//broker <- hashInst
-						// if instruction was not received from peer it should be broadcasted
+						if hashInst.nonpeer {
+							message := NewNetworkMessage(BroadcastInstruction(hashInst.msg), token, false)
+							peers.Broadcast(message)
+						}
 					}
+					//broker <- hashInst
+					// if instruction was not received from peer it should be broadcasted
 				}
 			case newEpoch := <-newBlockSignal:
 				deltaEpoch := int(newEpoch) - currentEpoch
