@@ -3,11 +3,26 @@ package crypto
 import (
 	"bytes"
 	"crypto/sha256"
+	"encoding/base64"
 )
 
 type Hash [Size]byte
 
+var hashLength = base64.StdEncoding.EncodedLen(Size)
+
+func (h Hash) MarshalText() (text []byte, err error) {
+	text = make([]byte, hashLength)
+	base64.StdEncoding.Encode(text, h[:])
+	return
+}
+
+func (h Hash) UnmarshalText(text []byte) error {
+	_, err := base64.StdEncoding.Decode(h[:], text)
+	return err
+}
+
 var ZeroHash Hash = Hasher([]byte{})
+var ZeroValueHash Hash
 
 func (hash Hash) ToInt64() int64 {
 	return int64(hash[0]) + (int64(hash[1]) << 8) + (int64(hash[2]) << 16) + (int64(hash[3]) << 24)

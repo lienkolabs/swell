@@ -25,6 +25,17 @@ import (
 
 type Signature [SignatureSize]byte
 
+func (s Signature) MarshalText() (text []byte, err error) {
+	text = make([]byte, 2*SignatureSize)
+	hex.Encode(text, s[:])
+	return
+}
+
+func (s Signature) UnmarshalText(text []byte) error {
+	_, err := hex.Decode(s[:], text)
+	return err
+}
+
 var ZeroToken Token
 var ZeroPrivateKey PrivateKey
 
@@ -85,6 +96,12 @@ func (p Token) Hex() string {
 	return hex.EncodeToString(p[:])
 }
 
+func (p Token) MarshalText() (text []byte, err error) {
+	text = make([]byte, 2*TokenSize)
+	hex.Encode(text, p[:])
+	return
+}
+
 func (p PrivateKey) Sign(msg []byte) Signature {
 
 	var signature Signature
@@ -129,6 +146,11 @@ func (p PrivateKey) Sign(msg []byte) Signature {
 }
 
 type Token [TokenSize]byte
+
+func (t Token) UnmarshalText(text []byte) error {
+	_, err := hex.Decode(t[:], text)
+	return err
+}
 
 func (t Token) Equals(bytes []byte) bool {
 	if len(bytes) != TokenSize {
