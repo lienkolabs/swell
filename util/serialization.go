@@ -81,6 +81,15 @@ func ParseToken(data []byte, position int) (crypto.Token, int) {
 	return token, position + crypto.TokenSize
 }
 
+func ParseHash(data []byte, position int) (crypto.Hash, int) {
+	var hash crypto.Hash
+	if position+crypto.Size > len(data) {
+		return hash, position
+	}
+	copy(hash[:], data[position:position+crypto.Size])
+	return hash, position + crypto.Size
+}
+
 func PutTokenCipher(tc crypto.TokenCipher, data *[]byte) {
 	PutToken(tc.Token, data)
 	PutByteArray(tc.Cipher, data)
@@ -192,11 +201,6 @@ func ParseByte(data []byte, position int) (byte, int) {
 		return 0, position + 1
 	}
 	return data[position], position + 1
-}
-
-func ParseHash(data []byte, position int) (crypto.Hash, int) {
-	bytes, newPosition := ParseByteArray(data, position)
-	return crypto.BytesToHash(bytes), newPosition
 }
 
 func ParseTokenCipher(data []byte, position int) (crypto.TokenCipher, int) {

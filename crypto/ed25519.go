@@ -147,6 +147,11 @@ func (p PrivateKey) Sign(msg []byte) Signature {
 
 type Token [TokenSize]byte
 
+func (t Token) String() string {
+	text, _ := t.MarshalText()
+	return string(text)
+}
+
 func (t Token) UnmarshalText(text []byte) error {
 	_, err := hex.Decode(t[:], text)
 	return err

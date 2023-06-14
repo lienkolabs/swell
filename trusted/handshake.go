@@ -1,4 +1,4 @@
-package net
+package trusted
 
 import (
 	"crypto/subtle"
