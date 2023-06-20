@@ -16,6 +16,12 @@ func (h Hash) MarshalText() (text []byte, err error) {
 	return
 }
 
+func DecodeHash(text string) Hash {
+	var hash Hash
+	base64.StdEncoding.Decode(hash[:], []byte(text))
+	return hash
+}
+
 func (h Hash) UnmarshalText(text []byte) error {
 	_, err := base64.StdEncoding.Decode(h[:], text)
 	return err
