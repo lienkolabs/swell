@@ -22,6 +22,12 @@ func DecodeHash(text string) Hash {
 	return hash
 }
 
+func EncodeHash(h Hash) string {
+	text := make([]byte, hashLength)
+	base64.StdEncoding.Encode(text, h[:])
+	return string(text)
+}
+
 func (h Hash) UnmarshalText(text []byte) error {
 	_, err := base64.StdEncoding.Decode(h[:], text)
 	return err
